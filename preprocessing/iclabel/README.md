@@ -3,15 +3,14 @@
 The main script that must be run is "run_icalabel.m"  (number of start and end subject must be defined as an input in order to be able to parallelize it)
 The architecture of the files must be the same as in the initial dataset 
 
-
 The level for artifact removal has been set to correlation 0.6 (everything above this are rejected as artifact).
-In order to run the code you need eeglab2019_1, with plugins Biosig, Cleanrawdata and IClabel v 1.2.4 preinstalled
 
+In order to run the code you need eeglab2019_1, with plugins Biosig, Cleanrawdata and IClabel v 1.2.4 preinstalled
 You need to replace the following functions of eeglab: 
   - pop_runinca.m   (line 385 adapted in order to have full rank)
   - pop_clean_rawdata.m  (line 125 adapted in order to be able to load the same preselected settings for Cleanrawdata plugin).
 
-The file input.mat includes the preselected setting for Cleanrawdata plugin
+The file input.mat includes the preselected settings for Cleanrawdata plugin
 
 The file neureca.locs includes the positions and different namings of the electrodes in Neureka challenge
 
