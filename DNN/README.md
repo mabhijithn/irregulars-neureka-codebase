@@ -16,3 +16,8 @@ saves the model parameters during training for later use.
 This notebook takes previously trained model parameters and a file containing preprocessed EEG and prepares
 individual predictions for our three different types of data (raw EEG, Wiener filtered and ICLabel) for fusion
 and post-processing.
+
+
+* attention_unet_{raw, iclabel, wiener}.h5
+
+Saved model weights for the raw EEG, ICLabel data and Wiener filtered EEG respectively.
