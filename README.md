@@ -8,5 +8,6 @@
 4. Seizure Detection Pipeline-Description.docx - An MS Word document describing the seizure prediction pipeline briefly.
 
 
-- Biomed Irregulars
+- Biomed Irregulars:
+
   C. Chatzichristos, J. Dan, A.M. Narayanan, N. Seeuws, K. Vandecasteele
