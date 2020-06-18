@@ -13,14 +13,9 @@ EDF_ROOT = '/esat/biomeddata/Neureka_challenge/edf/dev/'
 # Root folder of predictions on edf files
 PREDICTION_ROOT = 'evaluation'
 
-# custom lib
-import nedc
-import spir
-
 # std lib
 import glob
 import os
-import pathlib
 
 # 3rd party lib
 import h5py
@@ -28,7 +23,6 @@ from keras.models import Sequential
 from keras.layers import Bidirectional, Dense, GRU, LSTM
 import numpy as np
 import resampy
-from scipy.io import loadmat
 
 
 # +
