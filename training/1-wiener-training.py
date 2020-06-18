@@ -11,7 +11,7 @@ The script produces a pickle object containing the filters
 import sys
 # Adapt these two path to the root of the EDF data and to the root of the codebase
 EDF_ROOT = '/esat/biomeddata/Neureka_challenge/edf/train'
-sys.path.insert(0, "/users/sista/jdan/neureka/neureka-codebase/vizualize-seizures")
+sys.path.insert(0, 'library')
 
 # custom library
 import nedc

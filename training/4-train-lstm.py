@@ -7,7 +7,7 @@ The model is saved in model-dnn-dnnw-dnnicalbl-lstm-4.h5
 
 import sys
 # Root folder of main library
-sys.path.insert(0, "/users/sista/jdan/neureka/neureka-codebase/vizualize-seizures")
+sys.path.insert(0, 'library')
 # Root folder of EDF files
 EDF_ROOT = '/esat/biomeddata/Neureka_challenge/edf/dev/'
 # Root folder of predictions on edf files
