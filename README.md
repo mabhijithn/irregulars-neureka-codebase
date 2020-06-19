@@ -25,6 +25,8 @@ Python requires the libraries listed in [python_requirements.txt](python_require
 While the intent of the code is to allow deceminatation and re-use of our pipeline and model architecture. We realize the code is not *click & run* and documentation is sometimes lacking. We do invite you to contact us through email or as a github issue to improve quality and understanding of the code.
 
 
+---
 
+The code is release under the GNU GPLv3 license.
 
   
