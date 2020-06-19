@@ -2,7 +2,7 @@
 
 This repository contains the code of the *Biomed Irregulars* submission to the Neureka Challenge 2020. The *Biomed irregulars* team consists of PhD students from the the ESAT-STADIUS research group at KU Leuven: C. Chatzichristos, J. Dan, A.M. Narayanan, N. Seeuws, K. Vandecasteele.
 
-The seizure detection algorithm is based on the fusion of multiple attention U-nets, each operating on a distinct view of the EEG data. The outputs of the different U-nets are fused by an LSTM network. More information about the methods and results can be found in the preliminary version of the paper 'neureka_ieee_spmb.pdf'.
+The seizure detection algorithm is based on the fusion of multiple attention U-nets, each operating on a distinct view of the EEG data. The outputs of the different U-nets are fused by an LSTM network. More information about the methods and results can be found in the preliminary version of the paper [neureka_ieee_spmb.pdf](https://github.com/mabhijithn/irregulars-neureka-codebase/raw/public/neureka_ieee_spmb.pdf).
 
 
 ## Code: Content 
