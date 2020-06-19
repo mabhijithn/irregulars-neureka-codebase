@@ -1,13 +1,20 @@
-function run_icalabel(startsub,stopsub)
+function run_icalabel(startsub,stopsub,root,montage,saveroot)
+%Function for run the complete icalabel to all subjects (you need to include in the path eeglab and folder with "Extra" functions
+%Inputs 
+%startsub,stopsub - the number of subjects for which you want to run the algorithm.
+%montage - the montage for which you want to run the algorithm  (with the appropriate selection of montage startsub,stopsub you can parallelize the algorithm)
+%root- The root where the data are saved - the format must follow the one given by Temple Un.
+%saveroot- The folder where the results will be saved
 
-cd //user//leuven//336//vsc33613//eeglab2019_1
+%Example of the function paths which shall be included, root saveroot and montage formats
+%cd //user//leuven//336//vsc33613//eeglab2019_1
+%cd //user//leuven//336//vsc33613//Extra
+%root0 = '//scratch//leuven//333//vsc33378//Datasets//Neureka_challenge';
+%root1 = '//edf//dev';
+%root = [root0,root1];
+%montage='02_tcp_le';
+
 eeglab
-cd //user//leuven//336//vsc33613//Extra
-%% params
-root0 = '//scratch//leuven//333//vsc33378//Datasets//Neureka_challenge';
-root1 = '//edf//dev';
-root = [root0,root1];
-montage='02_tcp_le';
 path = fullfile(root, montage);
 [f,d] = getContent(path, 1);
     for ifolder = startsub:stopsub
@@ -61,8 +68,10 @@ path = fullfile(root, montage);
                     else
                         OUTEEG = pop_subcomp( EEG,indx );
                     end
-                    pfz=erase(f3{isession},'/ddn1/vol1/site_scratch/leuven/333/vsc33378/Datasets/Neureka_challenge');
-                    pfz=['/data/leuven/336/vsc33613/Neureka', pfz];
+                    %pfz=erase(f3{isession},'/ddn1/vol1/site_scratch/leuven/333/vsc33378/Datasets/Neureka_challenge');
+                    %pfz=['/data/leuven/336/vsc33613/Neureka', pfz];
+                    pfz=erase(f3{isession},root);
+                    pfz=[saveroot,pfz];
                     if(~exist(pfz , 'dir'))
                         mkdir(pfz);
                     end
