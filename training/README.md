@@ -17,7 +17,7 @@ Wiener pre-processing builds a filter bank of spatio-temporal filters based on a
 3. K-means clustering is used to group the artifacts
 4. The average representation of the groups is used to pre-compute a spatio-temporal wiener filter
 
-## 1. ICLabel pre-processing
+## 2. ICLabel pre-processing
 
 ICLabel pre-processing rejects any ``bad-channels'' and then removes any components of the signal which are clustered as artifacts.
 
