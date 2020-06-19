@@ -24,9 +24,12 @@ ICLabel pre-processing rejects any ``bad-channels'' and then removes any compone
 1. High pass filtering of the data
 2. Rejection of any bad channels (flat channels for above 20 seconds, channels with high SNR and channels with very low correlation to their estimation based on the rest of the channels)
 3. Computation of the Independent Components using SOBI ICA.
-4. Classification of the components using the ICLable package of EEGlab
-5. Rejection of all the componnets with a correlation higher than 0.6 to the following clusters: Muscle, Eye, Heart, Line Noise, Channel Noise
+4. Classification of the components using the ICLabel package of EEGlab
+5. Rejection of all the components with a correlation higher than 0.6 to the following clusters: Muscle, Eye, Heart, Line Noise, Channel Noise
 
+## 3. Train U-net
+
+A separate U-net is trained and stored for each available "view" on the data.
 
 ## 4. Train LSTM
 Fusion of the different U-Net DNN results is done using a shallow recurrent neural network.

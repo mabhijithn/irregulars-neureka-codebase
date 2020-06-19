@@ -287,6 +287,98 @@ def build_unet(window_size=4096, n_channels=18, n_filters=8):
     
     return unet, unet_train
 
+
+def build_windowfree_unet(n_channels=18, n_filters=8):
+    input_seq = Input(shape=(None, n_channels, 1))
+    
+    x = Conv2D(filters=n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(input_seq)
+    x = BatchNormalization()(x)
+    lvl0 = ELU()(x)
+    
+    x = MaxPooling2D(pool_size=(4, 1), padding='same')(lvl0)
+    x = Conv2D(filters=2*n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    lvl1 = ELU()(x)
+    
+    x = MaxPooling2D(pool_size=(4, 1), padding='same')(lvl1)
+    x = Conv2D(filters=4*n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    lvl2 = ELU()(x)
+    
+    x = MaxPooling2D(pool_size=(4, 1), padding='same')(lvl2)
+    x = Conv2D(filters=4*n_filters, kernel_size=(7, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    lvl3 = ELU()(x)
+    
+    x = MaxPooling2D(pool_size=(4, 1), padding='same')(lvl3)
+    x = Conv2D(filters=8*n_filters, kernel_size=(3, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    lvl4 = ELU()(x)
+    
+    x = MaxPooling2D(pool_size=(4, 1), padding='same')(lvl4)
+    x = Conv2D(filters=8*n_filters, kernel_size=(3, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    lvl5 = x
+    
+    x = MaxPooling2D(pool_size=(1, 20), padding='same')(lvl5)
+    x = Conv2D(filters=4*n_filters, kernel_size=(3, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    x = Dropout(rate=0.5)(x)
+    x = Conv2D(filters=4*n_filters, kernel_size=(3, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    x = Dropout(rate=0.5)(x)
+    
+    up4 = UpSampling2D(size=(4, 1))(x)
+    att4 = AttentionPooling(filters=4*n_filters, channels=n_channels)([up4, lvl4])
+    
+    x = Concatenate(axis=-1)([up4, att4])
+    x = Conv2D(filters=4*n_filters, kernel_size=(3, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    
+    up3 = UpSampling2D(size=(4, 1))(x)
+    att3 = AttentionPooling(filters=4*n_filters, channels=n_channels)([up3, lvl3])
+    
+    x = Concatenate(axis=-1)([up3, att3])
+    x = Conv2D(filters=4*n_filters, kernel_size=(7, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    
+    up2 = UpSampling2D(size=(4, 1))(x)
+    att2 = AttentionPooling(filters=4*n_filters, channels=n_channels)([up2, lvl2])
+    
+    x = Concatenate(axis=-1)([up2, att2])
+    x = Conv2D(filters=4*n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    
+    
+    up1 = UpSampling2D(size=(4, 1))(x)
+    att1 = AttentionPooling(filters=4*n_filters, channels=n_channels)([up1, lvl1])
+    
+    x = Concatenate(axis=-1)([up1, att1])
+    x = Conv2D(filters=4*n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    
+    up0 = UpSampling2D(size=(4, 1))(x)
+    att0 = AttentionPooling(filters=4*n_filters, channels=n_channels)([up0, lvl0])
+    x = Concatenate(axis=-1)([up0, att0])
+    x = Conv2D(filters=4*n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    x = Conv2D(filters=4*n_filters, kernel_size=(15, 1), strides=(1, 1), padding='same', activation=None)(x)
+    x = BatchNormalization()(x)
+    x = ELU()(x)
+    output = Conv2D(filters=1, kernel_size=(15, 1), strides=(1, 1), padding='same', activation='sigmoid')(x)
+    
+    unet = Model(input_seq, output)
+    
+    return unet
+
 class SeizureState:
     def __init__(self, state):
         if state == 'seiz':
