@@ -3,7 +3,7 @@
 The seizure detection pipeline is trained in several independent steps:
 
 1. Train and build the Wiener filters.
-2. Build ICLabel filtered data
+2. Remove artifcats with ICLabel 
 3. Train U-nets
 4. Train LSTM
 
@@ -16,6 +16,16 @@ Wiener pre-processing builds a filter bank of spatio-temporal filters based on a
 2. PCA compressed spatio-temporal covariance matrices are used to represent the artifacts
 3. K-means clustering is used to group the artifacts
 4. The average representation of the groups is used to pre-compute a spatio-temporal wiener filter
+
+## 1. ICLabel pre-processing
+
+ICLabel pre-processing rejects any ``bad-channels'' and then removes any components of the signal which are clustered as artifacts.
+
+1. High pass filtering of the data
+2. Rejection of any bad channels (flat channels for above 20 seconds, channels with high SNR and channels with very low correlation to their estimation based on the rest of the channels)
+3. Computation of the Independent Components using SOBI ICA.
+4. Classification of the components using the ICLable package of EEGlab
+5. Rejection of all the componnets with a correlation higher than 0.6 to the following clusters: Muscle, Eye, Heart, Line Noise, Channel Noise
 
 
 ## 4. Train LSTM
