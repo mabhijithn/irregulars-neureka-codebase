@@ -1,0 +1,8 @@
+h5py
+keras
+matplotlib
+numpy
+pyedflib
+resampy
+scipy
+sklearn
