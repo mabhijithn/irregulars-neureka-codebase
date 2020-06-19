@@ -6,3 +6,4 @@ pyedflib
 resampy
 scipy
 sklearn
+tensorflow
