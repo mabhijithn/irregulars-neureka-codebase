@@ -7,7 +7,7 @@ The level for artifact removal has been set to correlation 0.6 (everything above
 
 In order to run the code you need eeglab2019_1, with plugins Biosig, Cleanrawdata and IClabel v 1.2.4 preinstalled
 You need to replace the following functions of eeglab: 
-  - pop_runinca.m   (line 385 adapted in order to have full rank)
+  - pop_runica.m   (line 385 adapted in order to have full rank)
   - pop_clean_rawdata.m  (line 125 adapted in order to be able to load the same preselected settings for Cleanrawdata plugin).
 
 The file input.mat includes the preselected settings for Cleanrawdata plugin
