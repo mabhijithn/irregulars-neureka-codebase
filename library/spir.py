@@ -4,6 +4,43 @@ from scipy.signal import convolve
 
 # ## COVARIANCE MATRIX ESTIMATION ###
 
+def build_lagged_copies(data, lag, ram=True, file=None):
+    """ Build matrix containing lagged copies of data
+    
+    Create a matrix with lagged copies of the rows in data.
+    Args:
+        data: data contained in an array (row = channels, column = samples)
+        lag: number of sample lags
+        ram: if True store in RAM; else as a memmap
+        file: location of memmap. If ram is True and file is None. memmap is
+              stored in /tmp
+    Return
+        noise: list of noise events in seconds. Each row contains two
+                 columns: [start time, end time]
+        noise_mask: bool mask containing True on samples marked as noise.
+    """
+    if ram:
+        # Build copies matrix in RAM
+        lagged_data = np.empty((len(data)*(lag+1), len(data[0])))
+    else:
+        # Build copies as a memmap
+        if file is None:
+            with tempfile.NamedTemporaryFile() as f:
+                file = f.name
+                lagged_data = np.memmap(f.name, dtype='float64', mode='w+', shape=(len(data)*(lag+1), len(data[0])))
+        else:
+            lagged_data = np.memmap(file, dtype='float64', mode='w+', shape=(len(data)*(lag+1), len(data[0])))
+        logging.info('Created file ({}) containing lagged copies of data'.format(file))
+    for num in range(lag + 1):
+        for ch in range(len(data)):
+            if num > 0:
+                lagged_data[ch*(lag+1)+num,:-num] = data[ch,num:]
+                lagged_data[ch*(lag+1)+num,-num:] = 0
+            else:
+                lagged_data[ch*(lag+1)+num,:] = data[ch,:]
+    return lagged_data
+
+
 def build_cov(data, events, lag, fs):
     """Build signal covariance matrix.
     
@@ -19,35 +56,15 @@ def build_cov(data, events, lag, fs):
     Return:
         Rxx: covariance matrix of event epochs (accross channels and lags)
     """
-    if len(events) == 0:
-        print('WARNING: Asked to calculate a covariance matrix on no events.')
-        return None
-
-    Rxx = np.empty((len(data)*(lag+1), len(data)*(lag+1)))
-    for lag1 in range(lag + 1):
-        for lag2 in range(lag + 1):
-            index1 = list()
-            index2 = list()
-            for event in events:
-                if max(lag1, lag2) < int(event[1]*fs) - int(event[0]*fs):
-                    i1 = int(event[0]*fs) + lag1
-                    i2 = int(event[0]*fs) + lag2
-                    if lag1 > lag2:
-                        iend1 = int(event[1]*fs)
-                        iend2 = int(event[1]*fs) - (lag1 - lag2)
-                    else:
-                        iend1 = int(event[1]*fs) - (lag2 - lag1)
-                        iend2 = int(event[1]*fs)
-                    index1.append(np.arange(i1, iend1))
-                    index2.append(np.arange(i2, iend2))
-            index1 = np.concatenate(index1, axis=0 )
-            index2 = np.concatenate(index2, axis=0 )
-            for ch1 in range(len(data)):
-                for ch2 in range(ch1, len(data)):
-                    tmp = np.cov(data[ch1, index1], data[ch2, index2])
-                    Rxx[ch1*(lag+1) + lag1, ch2*(lag+1) + lag2] = tmp[0, 1]
-                    Rxx[ch2*(lag+1) + lag2, ch1*(lag+1) + lag1] = tmp[0, 1]
+    t = 0
+    Rxx = np.zeros((len(data)*(lag+1), len(data)*(lag+1)))
+    for event in events:
+        lagged = build_lagged_copies(data[:,np.arange(int(event[0]*fs), int(event[1]*fs))], lag)
+        t += len(lagged)
+        Rxx += np.dot(lagged, np.transpose(lagged))
+    Rxx = Rxx / t
     return Rxx
+
 
 def build_rnn(data, seizures, lag, fs):
     """Build noise covariance matrix.
