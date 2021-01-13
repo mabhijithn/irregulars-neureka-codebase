@@ -18,7 +18,7 @@ import tensorflow as tf
 # Import some utilities from the training folder
 import sys
 sys.path.insert(0, 'training/3-DNN/')
-from utils import build_windowfree_unet
+from utils import build_windowfree_unet, setup_tf
 
 # All relevant files
 val_path = 'PATH_TO_DATASET.h5' # Pre-processed data file
