@@ -13,6 +13,10 @@ EDF_ROOT = '/esat/biomeddata/Neureka_challenge/edf/dev/'
 # Root folder of predictions on edf files
 PREDICTION_ROOT = 'evaluation'
 
+# custom library
+import nedc
+import spir
+
 # std lib
 import glob
 import os
@@ -28,12 +32,12 @@ import resampy
 # +
 def load_filenames():
     filenames = list()
-    with h5py.File(os.joind(PREDICTION_ROOT, 'prediction_test_iclabel.h5'), 'r') as f:
+    with h5py.File(os.path.join(PREDICTION_ROOT, 'prediction_test_iclabel.h5'), 'r') as f:
         filenames = list(f['filenames'])
     return filenames
 
 
-def prepare_file(file_i, filename, classifiers, f_nick, model_type):    
+def prepare_file(file_i, filename, classifiers, f_nick, model_type, fs):    
     # Load data
     x = list()
     for classifier in classifiers:
@@ -47,8 +51,14 @@ def prepare_file(file_i, filename, classifiers, f_nick, model_type):
     x = np.array(x)
     x = np.transpose(x)
     if model_type == 'lstm' or model_type == 'gru':
-        x = x.reshape((len(x), 1, len(x[0])))    
-    return x
+        x = x.reshape((len(x), 1, len(x[0])))
+    # Collect the true lables
+    seizures = nedc.loadTSE(os.path.join(EDF_ROOT,filename[:-4]+'.tse'))
+    
+    # Create labels at 1Hz sampling rate
+    y = spir.eventList2Mask(seizures, len(x), fs)
+    
+    return x,y
 
 
 class AvgModel:
@@ -96,7 +106,7 @@ def build_model(n_input, model_type, complexity=None):
     return model
 
 
-def train(model, model_type, classifiers, filenames):
+def train(model, model_type, classifiers, filenames, fs=1):
     if model_type == 'avg':
         return 0
     
@@ -108,7 +118,7 @@ def train(model, model_type, classifiers, filenames):
     
     # Train
     for i, filename in enumerate(filenames):
-        x, y = prepare_file(i, filename, classifiers, f_nick, model_type)
+        x, y = prepare_file(i, filename, classifiers, f_nick, model_type, fs)
         if np.any(y):
             model.fit(x, y, batch_size=1, epochs=15, verbose=1)
         else:
@@ -121,7 +131,7 @@ def train(model, model_type, classifiers, filenames):
 
 
 # +
-fs = 1
+fs = 1 # LSTM prediction sampling frequency
 
 classifiers = [{
     'name': 'ICA',
@@ -148,5 +158,5 @@ complexity = 4
 
 filenames = load_filenames()
 model = build_model(len(classifiers), modeltype, complexity)
-train(model, modeltype, classifiers, filenames)
+train(model, modeltype, classifiers, filenames, fs)
 model.save('model-dnn-dnnw-dnnicalbl-lstm-4.h5')
