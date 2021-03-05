@@ -37,14 +37,14 @@ def load_filenames():
     return filenames
 
 
-def prepare_file(file_i, filename, classifiers, f_nick, model_type, fs):    
+def prepare_file(file_i, filename, classifiers, f_unet, model_type, fs):    
     # Load data
     x = list()
     for classifier in classifiers:
-        if classifier['format'] == 'nick':
-            z = list(f_nick[classifier['name']]['filenames'])
+        if classifier['format'] == 'unet':
+            z = list(f_unet[classifier['name']]['filenames'])
             file_i =  z.index(filename)
-            predictions = f_nick[classifier['name']]['signals'][file_i]
+            predictions = f_unet[classifier['name']]['signals'][file_i]
             predictions = downsample(predictions, 200, fs)
         x.append(np.array(predictions, dtype=float))
         
@@ -55,7 +55,7 @@ def prepare_file(file_i, filename, classifiers, f_nick, model_type, fs):
     # Collect the true lables
     seizures = nedc.loadTSE(os.path.join(EDF_ROOT,filename[:-4]+'.tse'))
     
-    # Create labels at 1Hz sampling rate
+    # Create labels at fs sampling rate
     y = spir.eventList2Mask(seizures, len(x), fs)
     
     return x,y
@@ -110,24 +110,24 @@ def train(model, model_type, classifiers, filenames, fs=1):
     if model_type == 'avg':
         return 0
     
-    # Preload Nick data
-    f_nick = dict()
+    # Preload U-Net data
+    f_unet = dict()
     for classifier in classifiers:
-        if classifier['format'] == 'nick':
-            f_nick[classifier['name']] = h5py.File(classifier['file'], 'r')
+        if classifier['format'] == 'unet':
+            f_unet[classifier['name']] = h5py.File(classifier['file'], 'r')
     
     # Train
     for i, filename in enumerate(filenames):
-        x, y = prepare_file(i, filename, classifiers, f_nick, model_type, fs)
+        x, y = prepare_file(i, filename, classifiers, f_unet, model_type, fs)
         if np.any(y):
             model.fit(x, y, batch_size=1, epochs=15, verbose=1)
         else:
             model.fit(x, y, batch_size=1, epochs=1, verbose=1)
         model.reset_states()
         
-    # Close Nick data
-    for key in f_nick:
-        f_nick[key].close()
+    # Close U-Net data
+    for key in f_unet:
+        f_unet[key].close()
 
 
 # +
@@ -137,19 +137,19 @@ classifiers = [{
     'name': 'ICA',
     'file': os.join(PREDICTION_ROOT, 'prediction_test_iclabel.h5'),
     'fs': 200,
-    'format': 'nick',    
+    'format': 'unet',    
 },
     {
     'name': 'DNN',
     'file': os.join(PREDICTION_ROOT, 'prediction_test_raw.h5'),
     'fs': 200,
-    'format': 'nick',    
+    'format': 'unet',    
 },
 {
     'name': 'DNN-wiener',
     'file': os.join(PREDICTION_ROOT, 'prediction_test_wiener.h5'),
     'fs': 200,
-    'format': 'nick',
+    'format': 'unet',
 }
 ]
 
