@@ -1,6 +1,5 @@
 # Seizure Detection Codebase used in Neureka Challenge 2020
 
- [![HitCount](http://hits.dwyl.com/mabhijithn/irregulars-neureka-codebase.svg)](http://hits.dwyl.com/mabhijithn/irregulars-neureka-codebase)
 
 This repository contains the code of the *Biomed Irregulars* submission to the Neureka Challenge 2020. The *Biomed irregulars* team consists of PhD students from the the ESAT-STADIUS research group at KU Leuven: C. Chatzichristos, J. Dan, A.M. Narayanan, N. Seeuws, K. Vandecasteele.
 
